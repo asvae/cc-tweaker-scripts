@@ -1,53 +1,58 @@
 -- Discover Machine Methods Script
 -- This script helps you explore what data you can get from a specific machine
--- Run this after you've identified your machine peripheral name
 
 print("=== Machine Method Discovery ===")
-print("Enter the name of your machine peripheral (e.g., 'lathe_0'):")
-print("(Leave empty to list all peripherals first)")
+print("Enter machine name (e.g., 'lathe_0'):")
+print("(Leave empty to list all peripherals)")
 print()
 
 local machineName = read()
 
 if machineName == "" then
-    print("Listing all peripherals:")
+    print("Available peripherals:")
     local peripherals = peripheral.getNames()
     for i, name in ipairs(peripherals) do
         print("  " .. name .. " (" .. (peripheral.getType(name) or "unknown") .. ")")
     end
     print()
-    print("Please run this script again and enter a machine name.")
+    print("Press any key to exit...")
+    read()
     return
 end
 
 -- Check if peripheral exists
 if not peripheral.isPresent(machineName) then
-    print("Error: Peripheral '" .. machineName .. "' not found!")
-    print("Make sure:")
-    print("1. The machine has a wireless modem attached")
-    print("2. Your computer has a wireless modem")
-    print("3. Both modems are on the same channel (default 0)")
-    print("4. Right-clicked on modems to connect them")
-    print("5. The peripheral name is correct")
+    print("Error: '" .. machineName .. "' not found!")
+    print("Check:")
+    print("1. Wired modems connected")
+    print("2. Right-click modems to connect")
+    print("3. Correct peripheral name")
+    print()
+    print("Press any key to exit...")
+    read()
     return
 end
 
-print("Analyzing peripheral: " .. machineName)
+print("Analyzing: " .. machineName)
 print("Type: " .. (peripheral.getType(machineName) or "unknown"))
-print()
+print("Press any key to continue...")
+read()
 
 -- Get all available methods
 local methods = peripheral.getMethods(machineName)
 
 if not methods or #methods == 0 then
-    print("No methods available on this peripheral.")
+    print("No methods available.")
+    print("Press any key to exit...")
+    read()
     return
 end
 
-print("Available methods (" .. #methods .. "):")
-print()
+print("Found " .. #methods .. " methods")
+print("Press any key to see methods...")
+read()
 
--- Categorize methods by likely purpose
+-- Categorize methods
 local energyMethods = {}
 local stateMethods = {}
 local itemMethods = {}
@@ -70,58 +75,85 @@ for _, method in ipairs(methods) do
     end
 end
 
--- Display categorized methods
+-- Show each category with pause
 if #energyMethods > 0 then
-    print("🔋 Energy/Power Methods:")
-    for _, method in ipairs(energyMethods) do
+    term.clear()
+    print("=== Energy Methods ===")
+    for i, method in ipairs(energyMethods) do
         print("  - " .. method)
     end
     print()
+    print("Press any key for next category...")
+    read()
 end
 
 if #stateMethods > 0 then
-    print("📊 State/Status Methods:")
-    for _, method in ipairs(stateMethods) do
+    term.clear()
+    print("=== State Methods ===")
+    for i, method in ipairs(stateMethods) do
         print("  - " .. method)
     end
     print()
+    print("Press any key for next category...")
+    read()
 end
 
 if #itemMethods > 0 then
-    print("📦 Item/Inventory Methods:")
-    for _, method in ipairs(itemMethods) do
+    term.clear()
+    print("=== Item Methods ===")
+    for i, method in ipairs(itemMethods) do
         print("  - " .. method)
     end
     print()
+    print("Press any key for next category...")
+    read()
 end
 
 if #progressMethods > 0 then
-    print("⚙️ Progress/Recipe Methods:")
-    for _, method in ipairs(progressMethods) do
+    term.clear()
+    print("=== Progress Methods ===")
+    for i, method in ipairs(progressMethods) do
         print("  - " .. method)
     end
     print()
+    print("Press any key for next category...")
+    read()
 end
 
 if #otherMethods > 0 then
-    print("🔧 Other Methods:")
-    for _, method in ipairs(otherMethods) do
+    term.clear()
+    print("=== Other Methods ===")
+    for i, method in ipairs(otherMethods) do
         print("  - " .. method)
     end
     print()
+    print("Press any key to test methods...")
+    read()
 end
 
--- Try to call some common methods to see what data they return
-print("=== Testing Common Methods ===")
+-- Test methods
+term.clear()
+print("=== Testing Methods ===")
+print("Testing common methods...")
+print()
+
 local machine = peripheral.wrap(machineName)
+local tested = 0
 
 -- Test energy methods
 for _, method in ipairs(energyMethods) do
     local success, result = pcall(function() return machine[method]() end)
     if success then
-        print("✅ " .. method .. "() = " .. tostring(result))
+        print("✅ " .. method .. " = " .. tostring(result))
     else
-        print("❌ " .. method .. "() failed: " .. tostring(result))
+        print("❌ " .. method .. " failed")
+    end
+    tested = tested + 1
+    if tested % 3 == 0 then
+        print("Press any key to continue...")
+        read()
+        term.clear()
+        print("=== Testing Methods ===")
     end
 end
 
@@ -129,9 +161,16 @@ end
 for _, method in ipairs(stateMethods) do
     local success, result = pcall(function() return machine[method]() end)
     if success then
-        print("✅ " .. method .. "() = " .. tostring(result))
+        print("✅ " .. method .. " = " .. tostring(result))
     else
-        print("❌ " .. method .. "() failed: " .. tostring(result))
+        print("❌ " .. method .. " failed")
+    end
+    tested = tested + 1
+    if tested % 3 == 0 then
+        print("Press any key to continue...")
+        read()
+        term.clear()
+        print("=== Testing Methods ===")
     end
 end
 
@@ -139,16 +178,24 @@ end
 for _, method in ipairs(progressMethods) do
     local success, result = pcall(function() return machine[method]() end)
     if success then
-        print("✅ " .. method .. "() = " .. tostring(result))
+        print("✅ " .. method .. " = " .. tostring(result))
     else
-        print("❌ " .. method .. "() failed: " .. tostring(result))
+        print("❌ " .. method .. " failed")
+    end
+    tested = tested + 1
+    if tested % 3 == 0 then
+        print("Press any key to continue...")
+        read()
+        term.clear()
+        print("=== Testing Methods ===")
     end
 end
 
 print()
 print("=== Usage Example ===")
-print("Now you can use these methods in your monitoring script:")
 print('local machine = peripheral.wrap("' .. machineName .. '")')
-print('local energy = machine.getEnergy() -- if available')
-print('local state = machine.getState() -- if available')
-print('local progress = machine.getProgress() -- if available')
+print('local energy = machine.getEnergy()')
+print('local state = machine.getState()')
+print()
+print("Press any key to exit...")
+read()
