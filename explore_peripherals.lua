@@ -1,108 +1,72 @@
 -- Explore Peripherals Script
--- This script helps you discover devices connected via wireless modems
+-- This script helps you discover peripherals connected via wired modems
 
-print("=== Wireless Device Explorer ===")
-print("Scanning for devices on network...")
+print("=== Wired Peripheral Explorer ===")
+print("Scanning for connected peripherals...")
 sleep(1)
 
--- Check if we have a wireless modem
-local modem = peripheral.find("modem")
-if not modem then
-    print("No wireless modem found!")
-    print("Make sure you have a wireless modem attached to this computer.")
-    print()
-    print("Press any key to exit...")
-    read()
-    return
-end
+-- Get all connected peripherals (this includes wired modem connections)
+local peripherals = peripheral.getNames()
 
--- Open rednet on the modem
-rednet.open("top")  -- or "bottom", "left", "right" depending on modem position
-
-print("Wireless modem found!")
-print("Scanning for devices...")
-print("(This may take a few seconds)")
-print()
-
--- Scan for devices by sending ping messages
-local devices = {}
-local channel = 0  -- Default channel
-
--- Send ping to common channels
-for testChannel = 0, 10 do
-    rednet.broadcast("ping", testChannel)
-    sleep(0.1)
-end
-
--- Listen for responses
-local timeout = 3  -- seconds
-local startTime = os.clock()
-
-while os.clock() - startTime < timeout do
-    local id, message, protocol = rednet.receive(0.1)
-    if id and message == "pong" then
-        -- Found a device
-        local deviceInfo = {
-            id = id,
-            protocol = protocol or "unknown"
-        }
-        table.insert(devices, deviceInfo)
-    end
-end
-
--- Close rednet
-rednet.close()
-
-if #devices == 0 then
-    print("No devices found on network!")
+if #peripherals == 0 then
+    print("No peripherals found!")
     print("Check:")
-    print("1. Other devices have wireless modems")
-    print("2. Right-click modems to connect")
-    print("3. Same channel (default 0)")
-    print("4. Devices are powered and working")
+    print("1. Wired modems connected to computer")
+    print("2. Networking cables connecting modems")
+    print("3. Right-click modems to connect")
+    print("4. Other devices have wired modems")
     print()
     print("Press any key to exit...")
     read()
     return
 end
 
-print("Found " .. #devices .. " device(s) on network")
+print("Found " .. #peripherals .. " peripheral(s)")
 print("Press any key to continue...")
 read()
 
--- Show each device with pause
-for i, device in ipairs(devices) do
+-- Show each peripheral with pause
+for i, name in ipairs(peripherals) do
     term.clear()
-    print("=== Device " .. i .. "/" .. #devices .. " ===")
-    print("ID: " .. device.id)
-    print("Protocol: " .. device.protocol)
+    print("=== Peripheral " .. i .. "/" .. #peripherals .. " ===")
+    print("Name: " .. name)
     
-    -- Try to get more info about this device
-    print("Attempting to connect...")
+    -- Get peripheral type
+    local peripheralType = peripheral.getType(name)
+    print("Type: " .. (peripheralType or "unknown"))
     
-    -- Try to wrap as peripheral (this might work for some devices)
-    local success, peripheral = pcall(function()
-        return peripheral.wrap("modem")
-    end)
-    
-    if success then
-        print("Modem connection: OK")
+    -- Get available methods
+    local methods = peripheral.getMethods(name)
+    if methods and #methods > 0 then
+        print("Methods: " .. #methods)
+        print("First few methods:")
+        for j = 1, math.min(5, #methods) do
+            print("  - " .. methods[j])
+        end
+        if #methods > 5 then
+            print("  ... and " .. (#methods - 5) .. " more")
+        end
     else
-        print("Modem connection: Failed")
+        print("No methods available")
     end
     
     print()
-    if i < #devices then
-        print("Press any key for next device...")
+    if i < #peripherals then
+        print("Press any key for next peripheral...")
         read()
     end
 end
 
-print("=== Network Info ===")
-print("To connect to a device:")
-print("1. Use rednet.send(device_id, message)")
-print("2. Use rednet.receive() to get responses")
-print("3. Check device documentation for commands")
+print("=== Usage Info ===")
+print("To use a peripheral:")
+print('local device = peripheral.wrap("peripheral_name")')
+print('local data = device.getMethodName()')
+print()
+print("Common machine methods:")
+print("- getEnergy() - Energy level")
+print("- getState() - Machine state")
+print("- getProgress() - Progress (0-1)")
+print("- isActive() - Is working?")
 print()
 print("Press any key to exit...")
 read()
