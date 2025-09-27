@@ -10,18 +10,18 @@ local machineName = read()
 
 if machineName == "" then
     print("Available peripherals:")
-    local peripherals = peripheral.getNames()
-    for i, name in ipairs(peripherals) do
-        print("  " .. name .. " (" .. (peripheral.getType(name) or "unknown") .. ")")
+    -- Use the correct API - peripherals is the global
+    for name, info in pairs(peripherals) do
+        print("  " .. name .. " (" .. (info.type or "unknown") .. ")")
     end
     print()
-    print("Press any key to exit...")
-    read()
-    return
+    print("Using default: gtceu:ev_wiremill_0")
+    machineName = "gtceu:ev_wiremill_0"
+    sleep(1)
 end
 
 -- Check if peripheral exists
-if not peripheral.isPresent(machineName) then
+if not peripherals[machineName] then
     print("Error: '" .. machineName .. "' not found!")
     print("Check:")
     print("1. Wired modems connected")
@@ -34,12 +34,12 @@ if not peripheral.isPresent(machineName) then
 end
 
 print("Analyzing: " .. machineName)
-print("Type: " .. (peripheral.getType(machineName) or "unknown"))
+print("Type: " .. (peripherals[machineName].type or "unknown"))
 print("Press any key to continue...")
 read()
 
 -- Get all available methods
-local methods = peripheral.getMethods(machineName)
+local methods = peripherals[machineName].methods or {}
 
 if not methods or #methods == 0 then
     print("No methods available.")
@@ -50,6 +50,17 @@ end
 
 print("Found " .. #methods .. " methods")
 print("Press any key to see methods...")
+read()
+
+-- Show all methods first
+term.clear()
+print("=== All Methods ===")
+for i, method in ipairs(methods) do
+    print("  - " .. method)
+    sleep(0.1)  -- Small delay to see each method appear
+end
+print()
+print("Press any key to see categorized methods...")
 read()
 
 -- Categorize methods
@@ -74,6 +85,24 @@ for _, method in ipairs(methods) do
         table.insert(otherMethods, method)
     end
 end
+
+-- Show category counts
+term.clear()
+print("=== Method Categories ===")
+print("Categorizing methods...")
+sleep(0.5)
+print("Energy methods: " .. #energyMethods)
+sleep(0.2)
+print("State methods: " .. #stateMethods)
+sleep(0.2)
+print("Item methods: " .. #itemMethods)
+sleep(0.2)
+print("Progress methods: " .. #progressMethods)
+sleep(0.2)
+print("Other methods: " .. #otherMethods)
+print()
+print("Press any key to see categories...")
+read()
 
 -- Show each category with pause
 if #energyMethods > 0 then
@@ -137,7 +166,7 @@ print("=== Testing Methods ===")
 print("Testing common methods...")
 print()
 
-local machine = peripheral.wrap(machineName)
+local machine = peripherals[machineName]
 local tested = 0
 
 -- Test energy methods
@@ -193,7 +222,7 @@ end
 
 print()
 print("=== Usage Example ===")
-print('local machine = peripheral.wrap("' .. machineName .. '")')
+print('local machine = peripherals["' .. machineName .. '"]')
 print('local energy = machine.getEnergy()')
 print('local state = machine.getState()')
 print()
