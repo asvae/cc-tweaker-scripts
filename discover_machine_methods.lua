@@ -108,8 +108,11 @@ read()
 if #energyMethods > 0 then
     term.clear()
     print("=== Energy Methods ===")
+    print("Showing energy methods...")
+    sleep(0.3)
     for i, method in ipairs(energyMethods) do
         print("  - " .. method)
+        sleep(0.1)
     end
     print()
     print("Press any key for next category...")
@@ -119,8 +122,11 @@ end
 if #stateMethods > 0 then
     term.clear()
     print("=== State Methods ===")
+    print("Showing state methods...")
+    sleep(0.3)
     for i, method in ipairs(stateMethods) do
         print("  - " .. method)
+        sleep(0.1)
     end
     print()
     print("Press any key for next category...")
@@ -130,8 +136,11 @@ end
 if #itemMethods > 0 then
     term.clear()
     print("=== Item Methods ===")
+    print("Showing item methods...")
+    sleep(0.3)
     for i, method in ipairs(itemMethods) do
         print("  - " .. method)
+        sleep(0.1)
     end
     print()
     print("Press any key for next category...")
@@ -141,8 +150,11 @@ end
 if #progressMethods > 0 then
     term.clear()
     print("=== Progress Methods ===")
+    print("Showing progress methods...")
+    sleep(0.3)
     for i, method in ipairs(progressMethods) do
         print("  - " .. method)
+        sleep(0.1)
     end
     print()
     print("Press any key for next category...")
@@ -152,8 +164,11 @@ end
 if #otherMethods > 0 then
     term.clear()
     print("=== Other Methods ===")
+    print("Showing other methods...")
+    sleep(0.3)
     for i, method in ipairs(otherMethods) do
         print("  - " .. method)
+        sleep(0.1)
     end
     print()
     print("Press any key to test methods...")
@@ -163,20 +178,30 @@ end
 -- Test methods
 term.clear()
 print("=== Testing Methods ===")
+print("Connecting to machine...")
+sleep(0.5)
 print("Testing common methods...")
+sleep(0.3)
 print()
 
 local machine = peripherals[machineName]
 local tested = 0
 
 -- Test energy methods
+if #energyMethods > 0 then
+    print("Testing energy methods...")
+    sleep(0.3)
+end
 for _, method in ipairs(energyMethods) do
+    print("Testing " .. method .. "...")
+    sleep(0.2)
     local success, result = pcall(function() return machine[method]() end)
     if success then
         print("✅ " .. method .. " = " .. tostring(result))
     else
         print("❌ " .. method .. " failed")
     end
+    sleep(0.3)
     tested = tested + 1
     if tested % 3 == 0 then
         print("Press any key to continue...")
@@ -187,13 +212,20 @@ for _, method in ipairs(energyMethods) do
 end
 
 -- Test state methods
+if #stateMethods > 0 then
+    print("Testing state methods...")
+    sleep(0.3)
+end
 for _, method in ipairs(stateMethods) do
+    print("Testing " .. method .. "...")
+    sleep(0.2)
     local success, result = pcall(function() return machine[method]() end)
     if success then
         print("✅ " .. method .. " = " .. tostring(result))
     else
         print("❌ " .. method .. " failed")
     end
+    sleep(0.3)
     tested = tested + 1
     if tested % 3 == 0 then
         print("Press any key to continue...")
@@ -204,13 +236,20 @@ for _, method in ipairs(stateMethods) do
 end
 
 -- Test progress methods
+if #progressMethods > 0 then
+    print("Testing progress methods...")
+    sleep(0.3)
+end
 for _, method in ipairs(progressMethods) do
+    print("Testing " .. method .. "...")
+    sleep(0.2)
     local success, result = pcall(function() return machine[method]() end)
     if success then
         print("✅ " .. method .. " = " .. tostring(result))
     else
         print("❌ " .. method .. " failed")
     end
+    sleep(0.3)
     tested = tested + 1
     if tested % 3 == 0 then
         print("Press any key to continue...")
